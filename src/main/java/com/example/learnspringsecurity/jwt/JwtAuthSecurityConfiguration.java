@@ -28,7 +28,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 
-@Configuration
+//@Configuration
 public class JwtAuthSecurityConfiguration { // 필터 체인 설정 가능.
 
     @Bean
