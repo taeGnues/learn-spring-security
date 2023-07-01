@@ -12,13 +12,14 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
 
-@Configuration
+//@Configuration
 public class BasicAuthSecurityConfiguration { // 필터 체인 설정 가능.
     @Bean
     @Order(2147483642)
@@ -63,14 +64,27 @@ public class BasicAuthSecurityConfiguration { // 필터 체인 설정 가능.
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource){
 
-        var user = User.withUsername("gnues").password("{noop}dummy").roles("USER").build();// 인코딩을 안함.
-        var admin = User.withUsername("admin").password("{noop}dummy").roles("ADMIN").build();// 인코딩을 안함.
+        var user = User.withUsername("gnues")
+                //.password("{noop}dummy")
+                .password("dummy")
+                .passwordEncoder(str -> passwordEncoder().encode(str))
+                .roles("USER").build();
+        var admin = User.withUsername("admin")
+                .password("dummy")
+                .passwordEncoder(str -> passwordEncoder().encode(str))
+                .roles("ADMIN").build();
 
         var jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
         jdbcUserDetailsManager.createUser(user);
         jdbcUserDetailsManager.createUser(admin);
 
         return jdbcUserDetailsManager;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+        // 해싱함수 수행. 강도 매개변수가 클수록 패스워드를 해싱하는데 필요한 작업이 기하급수적으로 증가함..!(기본값 10)
     }
 
 
